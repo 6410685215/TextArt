@@ -1,80 +1,102 @@
 import java.io.*;
 import java.net.*;
+import java.awt.image.BufferedImage;
 
 public class Client {
-    private Socket socket = null;
-    private DataInputStream receive = null;
-    private DataOutputStream send = null;
+    private Socket client;
+    private String host;
+    private int port;
 
-    private void send(String message) {
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public void connect() {
         try {
-            send.writeUTF(message);
+            client = new Socket(host, port);
+            System.out.println("Connected to server: " + client.getInetAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    private String receive() {
+    
+    public void close() {
         try {
-            return receive.readUTF();
+            client.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     public void sendMsg(String message) {
-        send(message);
-        receive();
-    }
-
-    public void acknowledge() {
-        send("ack");
+        try {
+            DataOutputStream out = new DataOutputStream(client.getOutputStream());
+            out.writeUTF(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String receiveMsg() {
-        String message = receive();
-        acknowledge();
-        return message;
+        try {
+            DataInputStream in = new DataInputStream(client.getInputStream());
+            return in.readUTF();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public void sendInt(int[] arr) {
+    public void sendInt(int number) {
         try {
-            send.writeInt(arr.length);
-            for (int i = 0; i < arr.length; i++) {
-                send.writeInt(arr[i]);
+            DataOutputStream out = new DataOutputStream(client.getOutputStream());
+            out.writeInt(number);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int receiveInt() {
+        try {
+            DataInputStream in = new DataInputStream(client.getInputStream());
+            return in.readInt();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public void sendImage(Image image) {
+        try {
+            DataOutputStream out = new DataOutputStream(client.getOutputStream());
+            out.writeInt(image.getImage().getWidth());
+            out.writeInt(image.getImage().getHeight());
+            for (int x = 0; x < image.getImage().getWidth(); x++) {
+                for (int y = 0; y < image.getImage().getHeight(); y++) {
+                    out.writeInt(image.getImage().getRGB(x, y));
+                }
             }
-            receive();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void close() {
+    public Image receiveImage() {
         try {
-            receive.close();
-            send.close();
-            socket.close();
+            DataInputStream in = new DataInputStream(client.getInputStream());
+            int width = in.readInt();
+            int height = in.readInt();
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    image.setRGB(x, y, in.readInt());
+                }
+            }
+            return new Image(image);
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-    }
-
-    public Client(String address, int port) {
-        try {
-            socket = new Socket(address, port);
-            System.out.println("Connected");
-            receive = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            send = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Test the client
-    public static void main(String[] args) {
-        Client client = new Client("localhost", 10000);
-        System.out.println("Receive: " + client.receiveMsg());
-        client.sendMsg("Hello from client");
-        client.close();
     }
 }
