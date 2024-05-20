@@ -85,8 +85,8 @@ public class App {
             textArt.addLine(client.receiveMsg());
         }
 
-        // client.sendMsg("exit");
-        // System.out.println(client.receiveMsg());
+        client.sendMsg("exit");
+        System.out.println(client.receiveMsg());
         client.close();
 
         textArt.save("output.txt");

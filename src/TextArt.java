@@ -44,8 +44,8 @@ public class TextArt extends Thread {
     }
 
     public char getCharFromPixel(int pixel) {
-        char[] asciiChars = {' ', '.', ',', ':', ';', 'i', '1', 't', 'f', 'L', 'C', 'G', '0', '8', '#', '@'};
-        int[] asciiValues = {  0,   8,  16,  32,  48,  64,  80,  96, 112, 128, 144, 160, 176, 192, 208, 224};
+        char[] asciiChars = {' ', '.', ',', ':', ';', 'i', '1', 't', 'f', 'J', 'E', 'G', 'B', '$', '#', '@'};
+        int[] asciiValues = { 16,  32,  48,  64,  80,  96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256};
         for (int i = 0; i < asciiValues.length; i++) {
             if (pixel < asciiValues[i]) {
                 return asciiChars[i];
