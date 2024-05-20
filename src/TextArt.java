@@ -13,7 +13,7 @@ public class TextArt extends Thread {
     public TextArt(Image image) {
         this.textArt = new StringBuilder();
         this.image = image;
-        this.height = image.getHeight();
+        this.height = 0;
     }
 
     public void addLine(String line) {
