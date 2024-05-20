@@ -18,7 +18,17 @@ public class TextArt extends Thread {
 
     public void addLine(String line) {
         this.textArt.append(line).append("\n");
-        this.height++;
+        updateHeight();
+    }
+
+    private void updateHeight() {
+        int newHeight = 0;
+        int index = 0;
+        while (this.textArt.indexOf("\n", index) != -1) {
+            index = this.textArt.indexOf("\n", index) + 1;
+            newHeight++;
+        }
+        this.height = newHeight;
     }
 
     public void display() {
@@ -49,6 +59,7 @@ public class TextArt extends Thread {
             this.textArt.append(getCharFromPixel(pixel));
         }
         this.textArt.append("\n");
+        this.height++;
     }
 
     public void save(String filename) {
@@ -71,5 +82,19 @@ public class TextArt extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        Image image = new Image("../imgOrg.jpeg");
+        // image.setGrayScale();
+        TextArt textArt = new TextArt(image);
+        try {
+            textArt.start();
+            textArt.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        textArt.addLine("Hello, World!\nHow are you?");
+        System.out.println("TextArt height: " + textArt.getHeight());
     }
 }
